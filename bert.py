@@ -2,7 +2,7 @@ import torch
 import csv
 import pandas as pd
 from torch.utils.data import Dataset
-from transformers import TrainingArguments, Trainer, AutoTokenizer, AutoModelForSequenceClassification
+from transformers import TrainingArguments, Trainer, AutoTokenizer, AutoModelForSequenceClassification, BertTokenizer, BertForSequenceClassification
 
 
 def drop_na_and_duplicates(data):
@@ -44,8 +44,9 @@ class NLIDataset(Dataset):
     }
 
 
-tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
-model = AutoModelForSequenceClassification.from_pretrained('bert-base-multilingual-cased', num_labels=3)
+model_name = 'bert-base-multilingual-cased'
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name, num_labels=3)
 
 mnli_data = pd.read_csv('./dataset/multinli.train.ko.tsv', sep='\t', encoding='UTF-8', quoting=csv.QUOTE_NONE)
 snli_data = pd.read_csv('./dataset/snli_1.0_train.ko.tsv', sep='\t', encoding='UTF-8', quoting=csv.QUOTE_NONE)
@@ -91,6 +92,6 @@ trainer = Trainer(
 trainer.train()
 test_results = trainer.evaluate(test_dataset=test_ds)
 trainer.save_model('./ko_test_bert_model')
-tokenizer.save_pretrained('./ko_test_bert_tokenizer')
+# tokenizer.save_pretrained('./ko_test_bert_tokenizer')
 
 print('Test accuracy:', test_results['eval_accuracy'])
