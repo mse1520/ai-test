@@ -2,7 +2,7 @@ import torch
 import csv
 import pandas as pd
 from torch.utils.data import Dataset
-from transformers import TrainingArguments, Trainer, AutoTokenizer, AutoModelForSequenceClassification, BertTokenizer, BertForSequenceClassification
+from transformers import TrainingArguments, Trainer, BertTokenizer, BertForSequenceClassification
 
 
 def drop_na_and_duplicates(data):

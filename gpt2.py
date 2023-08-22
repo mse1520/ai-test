@@ -1,28 +1,19 @@
-# from transformers import GPT2Model, GPT2Tokenizer
+import torch
+from transformers import GPT2LMHeadModel, PreTrainedTokenizerFast
 
-# def generate_text_from_vector(vector, model, tokenizer, max_length=50):
-#   output = model.generate(vector, max_length=max_length, num_return_sequences=1)
-#   generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
-#   return generated_text
+tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
+                                                    bos_token='</s>', eos_token='</s>', unk_token='<unk>',
+                                                    pad_token='<pad>', mask_token='<mask>')
+model = GPT2LMHeadModel.from_pretrained('skt/kogpt2-base-v2')
 
-# model_name = 'gpt2-xl'
-# model = GPT2Model.from_pretrained(model_name)
-# tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-
-# input_vector = tokenizer.encode('what is your name?', return_tensors='pt')
-# generated_text = generate_text_from_vector(input_vector, model, tokenizer)
-
-# print('Generated text:', generated_text)
-
-
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
-
-model_name = 'gpt2-xl'
-tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-model = GPT2LMHeadModel.from_pretrained(model_name)
-
-inputs = tokenizer('what is my name?', return_tensors='pt')
-outputs = model.generate(**inputs, max_length=100)
-generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True, num_return_sequences=1, pad_token_id=tokenizer.eos_token_id)
-
-print(generated_text)
+text = '"metanode는 멋진 회사입니다.", "metanode에는 멋진 개발자들이 있습니다." 2문장을 요약하자면'
+input_ids = tokenizer.encode(text, return_tensors='pt')
+gen_ids = model.generate(input_ids,
+                         max_length=128,
+                         repetition_penalty=2.0,
+                         pad_token_id=tokenizer.pad_token_id,
+                         eos_token_id=tokenizer.eos_token_id,
+                         bos_token_id=tokenizer.bos_token_id,
+                         use_cache=True)
+generated = tokenizer.decode(gen_ids[0])
+print(generated)
